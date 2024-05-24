@@ -5,7 +5,9 @@
 /// @returns {string}
 function fmod_path_bundle(_file)
 {		
-	if(os_type == os_switch)
+	if(os_browser != browser_not_a_browser)
+		return _file;
+	else if(os_type == os_switch)
 	{
 		if (GM_build_type == "exe")
 			return $"rom:/{working_directory}{_file}";
@@ -124,6 +126,7 @@ function fmod_handle_async_events()
 	var _buffer_size = buffer_get_size(_async_buffer);
 	
 	var _size = fmod_fetch_callbacks(_buffer_address, _buffer_size);
+	ext_fix_external_buffer(_async_buffer);
 	
 	// This is a special case that signals the runner that the buffer size needs to be increased.
 	if (_size < 0) {

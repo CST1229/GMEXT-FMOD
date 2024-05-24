@@ -33,6 +33,7 @@ call %Utils% optionGetValue "switchSdkHash" SWITCH_SDK_HASH
 call %Utils% optionGetValue "winSdkPath" WIN_SDK_PATH
 call %Utils% optionGetValue "macosSdkPath" MACOS_SDK_PATH
 call %Utils% optionGetValue "linuxSdkPath" LINUX_SDK_PATH
+call %Utils% optionGetValue "html5SdkPath" HTML5_SDK_PATH
 call %Utils% optionGetValue "iosSdkPath" IOS_SDK_PATH
 call %Utils% optionGetValue "androidSdkPath" ANDROID_SDK_PATH
 call %Utils% optionGetValue "gdkSdkPath" GDK_SDK_PATH
@@ -154,6 +155,31 @@ exit /b 0
 
     setlocal enabledelayedexpansion
 
+exit /b 0
+
+:: ----------------------------------------------------------------------------------------------------
+:setupHTML5
+    :: Resolve the SDK path (must exist)
+    call %Utils% pathResolveExisting "%YYprojectDir%" "%HTML5_SDK_PATH%" SDK_PATH
+
+    :: Get library file paths
+    set SDK_CORE_SOURCE="%SDK_PATH%\api\core\lib\upstream\wasm\fmodL.js"
+    set SDK_CORE_WASM_SOURCE="%SDK_PATH%\api\core\lib\upstream\wasm\fmodL.wasm"
+    set SDK_STUDIO_SOURCE="%SDK_PATH%\api\studio\lib\upstream\wasm\fmodstudioL.js"
+    set SDK_STUDIO_WASM_SOURCE="%SDK_PATH%\api\studio\lib\upstream\wasm\fmodstudioL.wasm"
+
+    :: Asset hash match
+    :: call %Utils% assertFileHashEquals %SDK_CORE_SOURCE% %HTML5_SDK_HASH% "%ERROR_SDK_HASH%"
+
+    echo "Copying HTML5 dependencies"
+    if not exist "fmodL.js" call %Utils% itemCopyTo %SDK_CORE_SOURCE% "%YYPLATFORM_option_html5_foldername%\fmodL.js"
+    if not exist "fmodL.wasm" call %Utils% itemCopyTo %SDK_CORE_WASM_SOURCE% "%YYPLATFORM_option_html5_foldername%\fmodL.wasm"
+	
+    :: Copy studio libs if enabled
+    if %ENABLE_STUDIO_FLAG% == 1 (
+        if not exist "fmodstudioL.js" call %Utils% itemCopyTo %SDK_STUDIO_SOURCE% "%YYPLATFORM_option_html5_foldername%\fmodstudioL.js"
+        if not exist "fmodstudioL.wasm" call %Utils% itemCopyTo %SDK_STUDIO_WASM_SOURCE% "%YYPLATFORM_option_html5_foldername%\fmodstudioL.wasm"
+    )
 exit /b 0
 
 :: ----------------------------------------------------------------------------------------------------

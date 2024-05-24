@@ -26,6 +26,12 @@ setupAndroid() {
 }
 
 # ----------------------------------------------------------------------------------------------------
+setupHTML5() {
+    # Nothing to do here
+    :
+}
+
+# ----------------------------------------------------------------------------------------------------
 setupiOS() {
     # Resolve the SDK path (must exist)
     pathResolveExisting "%YYprojectDir%" "%IOS_SDK_PATH%" SDK_PATH

@@ -126,6 +126,44 @@ setupAndroid() {
 }
 
 # ----------------------------------------------------------------------------------------------------
+setupHTML5() {
+
+    # Resolve the SDK path (must exist)
+    pathResolveExisting "$YYprojectDir" "$HTML5_SDK_PATH" SDK_PATH
+
+    # Get library file paths
+    SDK_CORE_SOURCE="$SDK_PATH/api/core/lib/upstream/wasm/fmodL.js"
+    SDK_CORE_WASM_SOURCE="$SDK_PATH/api/core/lib/upstream/wasm/fmodL.wasm"
+    SDK_STUDIO_SOURCE="$SDK_PATH/api/studio/lib/upstream/wasm/fmodstudioL.js"
+    SDK_STUDIO_WASM_SOURCE="$SDK_PATH/api/studio/lib/upstream/wasm/fmodstudioL.wasm"
+
+    # assertFileHashEquals $SDK_CORE_SOURCE $LINUX_SDK_HASH "$ERROR_SDK_HASH"
+
+    echo "Copying HTML5 dependencies"
+    
+    # When running from CLI 'YYprojectName' will not be set, use 'YYprojectPath' instead.
+    if [ -z "$YYprojectName" ]; then
+        YYprojectName=$(basename "${YYprojectPath%.*}")
+    fi
+
+    fileExtract "${YYprojectName}.zip" "_temp"
+
+    if [[ ! -f "_temp/assets/fmodL.js" ]]; then 
+        itemCopyTo "$SDK_CORE_SOURCE" "_temp/assets/${YYPLATFORM_option_html5_foldername}/fmodL.js"
+        itemCopyTo "$SDK_CORE_WASM_SOURCE" "_temp/assets/${YYPLATFORM_option_html5_foldername}/fmodL.wasm"
+
+        # Copy studio libs if enabled
+        if [[$ENABLE_STUDIO_FLAG == 1]]; then
+            [[ ! -f "_temp/assets/fmodstudioL.js" ]] && itemCopyTo "$SDK_STUDIO_SOURCE" "_temp/assets/${YYPLATFORM_option_html5_foldername}/fmodstudioL.js"
+            [[ ! -f "_temp/assets/fmodstudioL.wasm" ]] && itemCopyTo "$SDK_STUDIO_WASM_SOURCE" "_temp/assets/${YYPLATFORM_option_html5_foldername}/fmodstudioL.wasm"
+        fi
+    fi
+
+    folderCompress "_temp" "${YYprojectName}.zip"
+    rm -r _temp
+}
+
+# ----------------------------------------------------------------------------------------------------
 setupiOS() {
     # Nothing to do here
     :
@@ -168,6 +206,7 @@ optionGetValue "sdkVersion" SDK_VERSION
 optionGetValue "winSdkHash" WIN_SDK_HASH
 optionGetValue "macosSdkHash" MACOS_SDK_HASH
 optionGetValue "linuxSdkHash" LINUX_SDK_HASH
+optionGetValue "html5SdkHash" HTML5_SDK_HASH
 optionGetValue "iosSdkHash" IOS_SDK_HASH
 optionGetValue "androidSdkHash" ANDROID_SDK_HASH
 optionGetValue "xboxOneSdkHash" XBOX_ONE_SDK_HASH

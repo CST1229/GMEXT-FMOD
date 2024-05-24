@@ -194,8 +194,23 @@ function ext_pack_args(_args) {
 /// @returns {Id.Buffer}
 function ext_return_buffer() {
 	static _return_buffer = buffer_create(EXT_BUFFER_RETURN_SIZE, buffer_fixed, 1);
+	ext_fix_external_buffer(_return_buffer);
 	buffer_seek(_return_buffer, buffer_seek_start, 0);
 	return _return_buffer;
+}
+
+function ext_fix_external_buffer(_buff) {
+	if (os_browser != browser_not_a_browser) {
+		// dumb workaround for a dumb html5-runtime-probably bug where
+		// if you write to a buffer externally, buffer_string/text reads
+		// don't work properly
+		var pos = buffer_tell(_buff);
+		buffer_seek(_buff, buffer_seek_end, 1);
+		var value = buffer_read(_buff, buffer_u8);
+		buffer_seek(_buff, buffer_seek_end, 1);
+		buffer_write(_buff, buffer_u8, value);
+		buffer_seek(_buff, buffer_seek_start, pos);
+	}
 }
 
 /// @returns {Pointer}
