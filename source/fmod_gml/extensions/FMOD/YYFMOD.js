@@ -2727,14 +2727,24 @@
 	/// @param {real} bank_ref 
 	/// @returns {real}
 	_window.fmod_studio_bank_load_sample_data = function(bank_ref) {
-		
+		const bank = /** @type {FMOD.Bank} */(getHandle(bank_ref));
+		if (!bank) {
+			ext.lastResult = fmod.ERR_EVENT_NOTFOUND;
+			return;
+		}
+		ext.lastResult = bank.loadSampleData();
 	};
 
 	/// @desc
 	/// @param {real} bank_ref 
 	/// @returns {real}
 	_window.fmod_studio_bank_unload_sample_data = function(bank_ref) {
-		
+		const bank = /** @type {FMOD.Bank} */(getHandle(bank_ref));
+		if (!bank) {
+			ext.lastResult = fmod.ERR_EVENT_NOTFOUND;
+			return;
+		}
+		ext.lastResult = bank.unloadSampleData();
 	};
 
 	/// @desc
@@ -4217,7 +4227,11 @@
 	/// @desc
 	/// @returns {real}
 	_window.fmod_studio_system_unload_all = function() {
-		
+		if (!ext.system) {
+			ext.lastResult = fmod.ERR_NOTREADY;
+			return;
+		}
+		ext.lastResult = ext.system.unloadAll();
 	};
 
 	/// @desc
